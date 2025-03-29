@@ -46,3 +46,13 @@ cloudinary:
   cloud-name: dv9yzzjgg
   api-key: 863228441834788
   api-secret: va22d2fmfeQ-aQI1xAUBn1-TeE0
+
+momo:
+  partner-code: MOMO
+  return-url: http://localhost:8080/swagger-ui/index.html#
+  endpoint: https://test-payment.momo.vn/v2/gateway/api/create
+  ipn-url: http://localhost:8080/v1/api/order/momo-return
+  access-key: F8BBA842ECF85
+  secret-key: K951B6PE1waDMi640xX08PD3vg6EkVlz
+  request-type: payWithMethod
+

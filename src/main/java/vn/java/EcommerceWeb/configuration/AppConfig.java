@@ -27,7 +27,7 @@ public class AppConfig {
 
     private final UserDetailService userDetailService;
     private final PreFilter preFilter;
-    private final String[] WHITE_LIST = {"/v1/api/**", "/v1/api/auth/**", "/v1/api/redis/**", "/v1/api/user" + "/**"};
+    private final String[] WHITE_LIST = {"https://test-payment.momo.vn/v2/gateway/api", "/v1/api/**", "/v1/api/auth/**", "/v1/api/redis/**", "/v1/api/user" + "/**"};
 
     @Bean
     public WebMvcConfigurer corsFilter() {

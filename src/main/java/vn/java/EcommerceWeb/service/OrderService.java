@@ -7,5 +7,11 @@ import java.io.UnsupportedEncodingException;
 
 public interface OrderService {
 
-    void createOrder(OrderRequest request) throws MessagingException, UnsupportedEncodingException;
+    String createOrder(OrderRequest request) throws MessagingException, UnsupportedEncodingException;
+
+    void updateOrderState(Long orderId, String resultCode);
+
+    void checkExpiredPaymentOrders();
+
+
 }
