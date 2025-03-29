@@ -1,0 +1,48 @@
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    url: jdbc:mysql://localhost:3306/ecommerce_web?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: root
+    password: tanhuy
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: update   # Hoặc 'none' nếu không muốn tự động cập nhật database
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+
+
+open:
+  api:
+    title: ${API_TITLE:DUMMY_API_TITLE_DEV}
+    version: 1.0.0
+    description: API document for java-practice-code
+    serverUrl: http://localhost:${server.port}
+    serverName: localhost
+
+jwt:
+  expiryTime: 5000000 #1000*60*60*24 = 1 day
+  refreshExpiryTime: 1209600000 #1000*60*60*24 = 1 day
+  secretKey: 15e2b0d3c33891ebb0f1ef609ec419420c20e320ce94c65fbc8c3312448eb225
+  refreshKey: 987654321987654321987654321987654321987654321
+  resetPasswordKey: 123456789123456789123456789123456789123456789
+
+cloudinary:
+  cloud-name: dv9yzzjgg
+  api-key: 863228441834788
+  api-secret: va22d2fmfeQ-aQI1xAUBn1-TeE0

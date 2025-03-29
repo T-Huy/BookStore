@@ -1,0 +1,11 @@
+spring:
+  config:
+    activate:
+      on-profile: product
+open:
+  api:
+    title: ${API_TITLE :DUMMY_API_TITLE_PRODUCT}
+    version: 1.0.0
+    description: API document for java-practice-code
+    serverUrl: http://localhost:${server.port}
+    serverName: localhost
