@@ -3,7 +3,6 @@ package vn.java.EcommerceWeb.model;
 import jakarta.persistence.*;
 import lombok.*;
 import vn.java.EcommerceWeb.enums.OrderStatus;
-import vn.java.EcommerceWeb.enums.PaymentStatus;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,9 +32,8 @@ public class Order extends  AbstractEntity<Long> {
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
-    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    private Set<Payment> payments = new HashSet<>();
-
+    @OneToOne(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private Payment payment;
 
     @OneToMany(mappedBy = "order", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     private Set<OrderItem> orderItems = new HashSet<>();

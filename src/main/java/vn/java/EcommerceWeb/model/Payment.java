@@ -14,7 +14,7 @@ import vn.java.EcommerceWeb.enums.PaymentStatus;
 @Table(name = "tbl_payment")
 public class Payment extends AbstractEntity<Long> {
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "order_id", nullable = false, unique = true)
     private Order order;
 
@@ -26,7 +26,7 @@ public class Payment extends AbstractEntity<Long> {
     @Enumerated(EnumType.STRING)
     private PaymentStatus paymentStatus;
 
-    @Column(name="transaction_id")
-    private String transactionId;
+    @Column(name="payment_url")
+    private String paymentUrl;
 
 }

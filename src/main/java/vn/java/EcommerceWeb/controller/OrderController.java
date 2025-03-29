@@ -8,8 +8,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import vn.java.EcommerceWeb.dto.request.CategoryRequest;
 import vn.java.EcommerceWeb.dto.request.OrderRequest;
 import vn.java.EcommerceWeb.dto.response.ResponseData;
 import vn.java.EcommerceWeb.dto.response.ResponseError;
@@ -29,10 +27,24 @@ public class OrderController {
     @PostMapping("/")
     public ResponseData<?> createOrder(@Valid @RequestBody OrderRequest request) {
         try {
-            orderService.createOrder(request);
-            return new ResponseData<>(HttpStatus.OK.value(), "Create order successfully");
+            String paymentUrl = orderService.createOrder(request);
+            return new ResponseData<>(HttpStatus.OK.value(), "Create order successfully", paymentUrl);
         } catch (Exception e) {
             log.error("Create order error: {}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Momo return order")
+    @PostMapping("/momo-return")
+    public ResponseData<?> momoReturn(@RequestParam String orderId, @RequestParam String resultCode) {
+        try {
+            log.warn("Callback momo: orderID: {}, resultCode: {}", orderId, resultCode);
+            String orderID = orderId.split("_")[0];
+            orderService.updateOrderState(Long.parseLong(orderID), resultCode);
+            return new ResponseData<>(HttpStatus.OK.value(), "Callback momo successfully");
+        } catch (Exception e) {
+            log.error("Callback momo: {}", e.getMessage(), e.getCause());
             return new ResponseError(HttpStatus.BAD_REQUEST.value(), e.getMessage());
         }
     }
