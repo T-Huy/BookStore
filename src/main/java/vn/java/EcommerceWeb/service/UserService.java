@@ -1,6 +1,5 @@
 package vn.java.EcommerceWeb.service;
 
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.web.multipart.MultipartFile;
 import vn.java.EcommerceWeb.dto.request.UpdatePassword;
 import vn.java.EcommerceWeb.dto.request.UserRequest;
@@ -12,6 +11,8 @@ import vn.java.EcommerceWeb.model.User;
 import java.io.IOException;
 
 public interface UserService {
+
+    UserDetailReponse getCurrentUserDetail();
 
     long createUser(UserRequest request, MultipartFile file) throws IOException;
 

@@ -18,6 +18,7 @@ import vn.java.EcommerceWeb.repository.AuthorRepository;
 import vn.java.EcommerceWeb.repository.CategoryRepository;
 import vn.java.EcommerceWeb.repository.ProductRepository;
 import vn.java.EcommerceWeb.repository.PublisherRepository;
+import vn.java.EcommerceWeb.service.BaseRedisService;
 import vn.java.EcommerceWeb.service.CloudinaryService;
 import vn.java.EcommerceWeb.service.ProductService;
 
@@ -40,6 +41,10 @@ public class ProductServiceImpl implements ProductService {
     private final PublisherRepository publisherRepository;
     private final AuthorRepository authorRepository;
     private final CloudinaryService cloudinaryService;
+    private final BaseRedisService baseRedisService;
+
+    private final String cacheKey = "products";
+
 
     @Override
     public Long createProduct(ProductRequest request, MultipartFile file) throws IOException {
@@ -76,6 +81,8 @@ public class ProductServiceImpl implements ProductService {
         }
         productRepository.save(product);
         log.info("Product created successfully");
+        // Xóa cache sau khi tạo sản phẩm mới
+        baseRedisService.delete(cacheKey);
         return product.getId();
     }
 
@@ -133,6 +140,7 @@ public class ProductServiceImpl implements ProductService {
             }
         }
         productRepository.save(product);
+        baseRedisService.delete(cacheKey);
         log.info("Product updated successfully");
     }
 
@@ -141,8 +149,8 @@ public class ProductServiceImpl implements ProductService {
         log.info("Product start deleting");
         getProductById(id);
         productRepository.deleteById(id);
+        baseRedisService.delete(cacheKey);
         log.info("Product deleted successfully");
-
     }
 
     @Override
@@ -168,12 +176,23 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
-    public PageResponse<?> getAllProduct(String keyword, Long categoryId, Double minPrice, Double maxPrice, int pageNo,
-                                         int pageSize, String sortBy) {
+    public PageResponse<?> getAllProduct(String keyword, Long categoryId, Double minPrice, Double maxPrice, int pageNo, int pageSize, String sortBy) {
+
+
+        String fieldKey = String.format("%s:%s:%s:%s", categoryId, pageNo, pageSize, sortBy);
+
         log.info("Product start getting all");
         if (pageNo > 0) {
             pageNo = pageNo - 1;
         }
+
+        if (baseRedisService.hashExists(cacheKey, fieldKey)) {
+            log.info("Get products from Redis cache");
+            Object cacheProducts = baseRedisService.hashGet(cacheKey, fieldKey);
+            PageResponse<?> pageResponse = (PageResponse<?>) cacheProducts;
+            return pageResponse;
+        }
+
         List<Sort.Order> sorts = new ArrayList<>();
         if (StringUtils.hasLength(sortBy)) {
             Pattern pattern = Pattern.compile("(\\w+?)(:)(.*)");
@@ -205,13 +224,16 @@ public class ProductServiceImpl implements ProductService {
                         .build())
                 .collect(Collectors.toList());
         log.info("Get all products successfully");
-        return PageResponse.builder()
+        PageResponse<?> pageResponse = PageResponse.builder()
                 .pageNo(pageNo + 1)
                 .pageSize(pageSize)
                 .totalPage(products.getTotalPages())
                 .totalElement(products.getTotalElements())
                 .items(responses)
                 .build();
+        baseRedisService.hashSet(cacheKey, fieldKey, pageResponse);
+        baseRedisService.setTimeToLive(cacheKey, 1); // cache trong 1 ngày
+        return pageResponse;
     }
 
     @Override

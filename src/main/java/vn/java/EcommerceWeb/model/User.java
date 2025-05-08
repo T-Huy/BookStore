@@ -49,7 +49,9 @@ public class User extends AbstractEntity<Long> implements UserDetails, Serializa
     @Column(name = "status")
     private UserStatus status;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "user",
+               fetch = FetchType.EAGER,
+               cascade = CascadeType.ALL)
     private Set<UserHasRole> roles = new HashSet<>();
 
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL)

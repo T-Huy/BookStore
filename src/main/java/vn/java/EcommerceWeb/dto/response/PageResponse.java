@@ -1,12 +1,16 @@
 package vn.java.EcommerceWeb.dto.response;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serializable;
 
-@Getter
+@Data
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PageResponse<T> implements Serializable {
     private int pageNo;
     private int pageSize;

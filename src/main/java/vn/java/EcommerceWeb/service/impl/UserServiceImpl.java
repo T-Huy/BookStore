@@ -6,6 +6,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +47,31 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserHasRoleRepository userHasRoleRepository;
     private final CloudinaryService cloudinaryService;
+
+    @Override
+    public UserDetailReponse getCurrentUserDetail() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || !(authentication.getPrincipal() instanceof User currentUser)) {
+            log.error("User not login");
+            throw new ResourceNotFoundException("User not login");
+        }
+        log.info("User get current user detail successfully");
+        return UserDetailReponse.builder()
+                .id(currentUser.getId())
+                .fullName(currentUser.getFullName())
+                .email(currentUser.getEmail())
+                .address(currentUser.getAddress())
+                .dateOfBirth(currentUser.getDateOfBirth())
+                .gender(currentUser.getGender())
+                .urlAvatar(currentUser.getUrlAvatar())
+                .phone(currentUser.getPhone())
+                .status(currentUser.getStatus())
+                .userRoles(currentUser.getRoles()
+                        .stream()
+                        .map(userHasRole -> userHasRole.getRole().getName())
+                        .collect(Collectors.toSet()))
+                .build();
+    }
 
     @Override
     @Transactional
@@ -171,7 +198,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public void updatePassword(Long userId, UpdatePassword request) {
 
-        if(!request.getNewPassword().equals(request.getConfirmPassword())){
+        if (!request.getNewPassword().equals(request.getConfirmPassword())) {
             log.error("New password and confirm password are not the same");
             throw new ResourceNotFoundException("New password and confirm password are not the same");
         }
@@ -194,7 +221,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public PageResponse<?> getAllUsers(int pageNo, int pageSize, String sortBy) {
-        if(pageNo > 0 ){
+        if (pageNo > 0) {
             pageNo = pageNo - 1;
         }
         List<Sort.Order> sorts = new ArrayList<>();
@@ -230,7 +257,7 @@ public class UserServiceImpl implements UserService {
                 .collect(Collectors.toList());
         log.info("Get all users successfully");
         return PageResponse.builder()
-                .pageNo(pageNo+1)
+                .pageNo(pageNo + 1)
                 .pageSize(pageSize)
                 .totalPage(users.getTotalPages())
                 .totalElement(users.getTotalElements())

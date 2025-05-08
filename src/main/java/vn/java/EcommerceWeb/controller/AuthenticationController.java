@@ -1,5 +1,6 @@
 package vn.java.EcommerceWeb.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,14 +10,14 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import vn.java.EcommerceWeb.dto.request.ResetPasswordRequest;
 import vn.java.EcommerceWeb.dto.request.SignInRequest;
+import vn.java.EcommerceWeb.dto.response.ResponseData;
+import vn.java.EcommerceWeb.dto.response.ResponseError;
 import vn.java.EcommerceWeb.dto.response.TokenResponse;
 import vn.java.EcommerceWeb.service.AuthenticationService;
+import vn.java.EcommerceWeb.service.UserService;
 
 @RestController
 @RequestMapping("/v1/api/auth")
@@ -27,6 +28,7 @@ import vn.java.EcommerceWeb.service.AuthenticationService;
 @RequiredArgsConstructor
 public class AuthenticationController {
     private final AuthenticationService authenticationService;
+    private final UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody @Valid SignInRequest request) {
@@ -95,6 +97,17 @@ public class AuthenticationController {
         }catch (Exception e) {
             log.error("Error: {}", e.getMessage(), e.getCause());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(e.getMessage());
+        }
+    }
+
+    @Operation(summary = "Get current user")
+    @GetMapping("/current-user")
+    public ResponseData<?> getCurrentUserDetail() {
+        try {
+            return new ResponseData<>(HttpStatus.OK.value(), "Get current user successfully", userService.getCurrentUserDetail());
+        } catch (Exception e) {
+            log.error("Error: {}", e.getMessage(), e.getCause());
+            return new ResponseError(HttpStatus.BAD_REQUEST.value(), "Get current user failed");
         }
     }
 }
